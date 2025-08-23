@@ -1,6 +1,9 @@
 package com.capitalgroup.scraper.scrapper.controller;
 
 import com.capitalgroup.scraper.scrapper.service.WebScraperService;
+
+import lombok.extern.slf4j.Slf4j;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -18,6 +21,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
 
 @RestController
+@Slf4j
 public class ScrapperController {
     @Autowired
     private WebScraperService webScraperService;
@@ -43,9 +47,10 @@ public class ScrapperController {
                 String fund = parts[2];
                 String name = parts[3];
                 String url = host + uri;
+                
                 Callable<String> task = () -> {
-                    String filePath = webScraperService.scrapeToCsv(url, audienceL+"_"+fund+"_"+type+"_"+name, type, fund);
-                    return type + ": " + filePath;
+                    return webScraperService.scrapeToCsv(url, audienceL+"_"+fund+"_"+type+"_"+name, type, fund);
+                    
                 };
                 futures.add(executor.submit(task));
             }

@@ -2,6 +2,7 @@ package com.capitalgroup.scraper.scrapper.service;
 
 import com.opencsv.CSVWriter;
 import io.github.bonigarcia.wdm.WebDriverManager;
+import lombok.extern.slf4j.Slf4j;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -20,6 +21,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@Slf4j
 @Service
 public class WebScraperService {
     public String scrapeToCsv(String url, String csvPath, String type, String fundType) throws IOException {
@@ -31,6 +33,7 @@ public class WebScraperService {
         WebDriver driver = new ChromeDriver(options);
         try {
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
+            log.info("Scraping URL: {}", url);
             driver.get(url);
             Thread.sleep(5000);
             String pageSource = driver.getPageSource();
@@ -69,7 +72,7 @@ public class WebScraperService {
                 }
             }
             File file = new File(newCsvPath);
-            System.out.println("CSV file stored at: " + file.getAbsolutePath());
+            log.info("CSV file stored at: {}", file.getAbsolutePath());
             return newCsvPath;
         } catch (InterruptedException e) {
             Thread.currentThread().interrupt();
