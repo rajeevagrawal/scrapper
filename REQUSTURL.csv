@@ -1,0 +1,8 @@
+URI,TYPE,FUND,NAME
+/investments/americanfunds?shareclass=F-2&pricing=NAV&showindices=true,RETURN,AF,F2-MONTHLY-WITHNAV
+/investments/americanfunds?shareclass=F-2&updated=quaterly,RETURN,AF,F2-QUATERLY
+/investments/americanfunds?shareclass=F-2&updated=quarterly&pricing=NAV&showindices=true,RETURN,AF,F2-QUATERLY-WITHNAV
+/investments/literature,LITERATURE,AF,LIT
+/investments/exchange-traded-funds/returns?term=monthly&indices=yes,RETURN,ETF,MONTHLY
+/investments/exchange-traded-funds/returns?term=quarterly&indices=yes,RETURN,ETF,QUATERLY
+/investments/exchange-traded-funds/daily-prices,DAILY,ETF,DAILY

@@ -1,4 +1,4 @@
-package com.capitalgroup.scraper.scrapper;
+package com.capitalgroup.scraper.scrapper.service;
 
 import com.opencsv.CSVWriter;
 import io.github.bonigarcia.wdm.WebDriverManager;
@@ -22,7 +22,7 @@ import java.util.List;
 
 @Service
 public class WebScraperService {
-    public String scrapeToCsv(String url, String csvPath) throws IOException {
+    public String scrapeToCsv(String url, String csvPath, String type, String fundType) throws IOException {
         WebDriverManager.chromedriver().setup();
         ChromeOptions options = new ChromeOptions();
         options.addArguments("--headless=new");
@@ -32,24 +32,37 @@ public class WebScraperService {
         try {
             driver.manage().timeouts().implicitlyWait(Duration.ofSeconds(10));
             driver.get(url);
-            // Wait for table or main content to load (customize selector as needed)
-            Thread.sleep(5000); // Simple wait, replace with WebDriverWait for production
+            Thread.sleep(5000);
             String pageSource = driver.getPageSource();
             Document doc = Jsoup.parse(pageSource);
-            Elements tableRows = doc.select("table tr");
             List<String[]> data = new ArrayList<>();
-            for (Element row : tableRows) {
-                Elements cols = row.select("th, td");
-                String[] rowData = cols.stream().map(Element::text).toArray(String[]::new);
-                if (rowData.length > 0) {
-                    data.add(rowData);
+            if ("literature".equalsIgnoreCase(type)) {
+                Elements links = doc.select("a[href]");
+                data.add(new String[]{"Link Text", "URL"});
+                for (Element link : links) {
+                    String linkText = link.text();
+                    String urlHref = link.absUrl("href");
+                    data.add(new String[]{linkText, urlHref});
+                }
+            } else {
+                Elements tableRows = doc.select("table tr");
+                for (Element row : tableRows) {
+                    Elements cols = row.select("th, td");
+                    String[] rowData = cols.stream().map(Element::text).toArray(String[]::new);
+                    if (rowData.length > 0) {
+                        data.add(rowData);
+                    }
                 }
             }
-            // Add timestamp to file name
+            // Ensure 'data/yyyyMMdd' directory exists
+            String dateFolder = new SimpleDateFormat("yyyyMMdd").format(new Date());
+            File datedDir = new File("data" + File.separator + dateFolder);
+            if (!datedDir.exists()) {
+                datedDir.mkdirs();
+            }
             String timestamp = new SimpleDateFormat("yyyyMMdd_HHmmss").format(new Date());
             String baseName = csvPath.replaceFirst("\\.csv$", "");
-            String newCsvPath = baseName + "_" + timestamp + ".csv";
-            
+            String newCsvPath = "data" + File.separator + dateFolder + File.separator +  baseName + "_" + timestamp + ".csv";
             try (CSVWriter writer = new CSVWriter(new FileWriter(newCsvPath))) {
                 for (String[] row : data) {
                     writer.writeNext(row);
